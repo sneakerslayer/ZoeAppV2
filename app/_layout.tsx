@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
+import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { useFrameworkReady } from '@/hooks/useFrameworkReady';
 import { AuthProvider } from '@/context/AuthContext';
 import { ThemeProvider } from '@/context/ThemeContext';
@@ -21,15 +22,17 @@ import { TherapyProvider } from '@/context/TherapyContext';
 SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
-  useFrameworkReady();
-  
+  const isReady = useFrameworkReady();
   const [fontsLoaded, fontError] = useFonts({
     'Inter-Regular': Inter_400Regular,
     'Inter-Medium': Inter_500Medium,
-    'Inter-SemiBold': Inter_600SemiBold, 
+    'Inter-SemiBold': Inter_600SemiBold,
     'Inter-Bold': Inter_700Bold,
-    'DMSerifDisplay-Regular': DMSerifDisplay_400Regular,
   });
+
+  if (!isReady || !fontsLoaded) {
+    return null;
+  }
 
   useEffect(() => {
     if (fontsLoaded || fontError) {
@@ -44,9 +47,10 @@ export default function RootLayout() {
   }
 
   return (
-    <ThemeProvider>
-      <AuthProvider>
-        <TherapyProvider>
+    <ErrorBoundary>
+      <ThemeProvider>
+        <AuthProvider>
+          <TherapyProvider>
           <Stack screenOptions={{ headerShown: false }}>
             <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
             <Stack.Screen name="(auth)" options={{ headerShown: false }} />
@@ -54,7 +58,8 @@ export default function RootLayout() {
           </Stack>
           <StatusBar style="auto" />
         </TherapyProvider>
-      </AuthProvider>
-    </ThemeProvider>
+        </AuthProvider>
+      </ThemeProvider>
+    </ErrorBoundary>
   );
 }

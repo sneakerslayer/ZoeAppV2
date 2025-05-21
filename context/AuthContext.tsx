@@ -1,161 +1,132 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import { createContext, useContext, useState, useEffect } from 'react';
 import * as SecureStore from 'expo-secure-store';
-import { Platform } from 'react-native';
+import { router } from 'expo-router';
 
-interface User {
-  id: string;
-  name: string;
-  email: string;
-  photoURL?: string;
-  createdAt: string;
+interface AuthState {
+  isAuthenticated: boolean;
+  userId: string | null;
+  email: string | null;
+  name: string | null;
+  loading: boolean;
 }
 
-interface AuthContextType {
-  user: User | null;
-  isAuthenticated: boolean;
-  isLoading: boolean;
+interface AuthContextType extends AuthState {
   login: (email: string, password: string) => Promise<void>;
   signup: (name: string, email: string, password: string) => Promise<void>;
-  logout: () => void;
-  updateUser: (userData: Partial<User>) => Promise<void>;
+  logout: () => Promise<void>;
 }
 
-const AuthContext = createContext<AuthContextType>({
-  user: null,
-  isAuthenticated: false,
-  isLoading: true,
-  login: async () => {},
-  signup: async () => {},
-  logout: () => {},
-  updateUser: async () => {},
-});
+const AuthContext = createContext<AuthContextType | null>(null);
 
-// Platform-specific storage implementation
-const storage = {
-  getItem: async (key: string): Promise<string | null> => {
-    if (Platform.OS === 'web') {
-      return localStorage.getItem(key);
-    }
-    return SecureStore.getItemAsync(key);
-  },
-  setItem: async (key: string, value: string): Promise<void> => {
-    if (Platform.OS === 'web') {
-      localStorage.setItem(key, value);
-      return;
-    }
-    return SecureStore.setItemAsync(key, value);
-  },
-  removeItem: async (key: string): Promise<void> => {
-    if (Platform.OS === 'web') {
-      localStorage.removeItem(key);
-      return;
-    }
-    return SecureStore.deleteItemAsync(key);
-  },
-};
+export function AuthProvider({ children }: { children: React.ReactNode }) {
+  const [state, setState] = useState<AuthState>({
+    isAuthenticated: false,
+    userId: null,
+    email: null,
+    name: null,
+    loading: true,
+  });
 
-export const useAuth = () => useContext(AuthContext);
-
-export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [user, setUser] = useState<User | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  
   useEffect(() => {
-    // Check for stored auth data on app start
-    const checkAuth = async () => {
-      try {
-        const storedUser = await storage.getItem('user');
-        if (storedUser) {
-          setUser(JSON.parse(storedUser));
-        }
-      } catch (error) {
-        console.error('Error checking auth:', error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    
-    checkAuth();
+    loadAuthState();
   }, []);
-  
-  const login = async (email: string, password: string) => {
-    setIsLoading(true);
+
+  const loadAuthState = async () => {
     try {
-      // Mock login - in production, this would call an API
-      // This creates a mock user for demonstration purposes
-      const mockUser: User = {
-        id: '123456',
-        name: 'Demo User',
+      const userId = await SecureStore.getItemAsync('userId');
+      const email = await SecureStore.getItemAsync('email');
+
+      setState(prev => ({
+        ...prev,
+        isAuthenticated: !!userId,
+        userId,
         email,
-        createdAt: new Date().toISOString(),
-      };
-      
-      setUser(mockUser);
-      await storage.setItem('user', JSON.stringify(mockUser));
+        loading: false,
+      }));
+    } catch (error) {
+      console.error('Error loading auth state:', error);
+      setState(prev => ({ ...prev, loading: false }));
+    }
+  };
+
+  const login = async (email: string, password: string) => {
+    try {
+      const response = await APIClient.request('/auth/login', {
+        method: 'POST',
+        body: JSON.stringify({ email, password }),
+      });
+
+      await SecureStore.setItemAsync('authToken', response.token);
+      await SecureStore.setItemAsync('userId', response.userId);
+      await SecureStore.setItemAsync('email', email);
+
+      setState({
+        isAuthenticated: true,
+        userId: mockUserId,
+        email,
+        loading: false,
+      });
+
+      router.replace('/(tabs)');
     } catch (error) {
       console.error('Login error:', error);
-      throw error;
-    } finally {
-      setIsLoading(false);
+      throw new Error('Login failed');
     }
   };
-  
+
   const signup = async (name: string, email: string, password: string) => {
-    setIsLoading(true);
     try {
-      // Mock signup - in production, this would call an API
-      const mockUser: User = {
-        id: '123456',
-        name,
+      // TODO: Implement actual API call to create user account
+      const mockUserId = 'new-user-' + Date.now();
+
+      await SecureStore.setItemAsync('userId', mockUserId);
+      await SecureStore.setItemAsync('email', email);
+      await SecureStore.setItemAsync('name', name);
+
+      setState({
+        isAuthenticated: true,
+        userId: mockUserId,
         email,
-        createdAt: new Date().toISOString(),
-      };
-      
-      setUser(mockUser);
-      await storage.setItem('user', JSON.stringify(mockUser));
+        loading: false,
+      });
+
+      router.replace('/(tabs)');
     } catch (error) {
       console.error('Signup error:', error);
-      throw error;
-    } finally {
-      setIsLoading(false);
+      throw new Error('Signup failed');
     }
   };
-  
+
   const logout = async () => {
     try {
-      await storage.removeItem('user');
-      setUser(null);
+      await SecureStore.deleteItemAsync('userId');
+      await SecureStore.deleteItemAsync('email');
+
+      setState({
+        isAuthenticated: false,
+        userId: null,
+        email: null,
+        loading: false,
+      });
+
+      router.replace('/login');
     } catch (error) {
       console.error('Logout error:', error);
+      throw new Error('Logout failed');
     }
   };
-  
-  const updateUser = async (userData: Partial<User>) => {
-    try {
-      if (!user) return;
-      
-      const updatedUser = { ...user, ...userData };
-      setUser(updatedUser);
-      await storage.setItem('user', JSON.stringify(updatedUser));
-    } catch (error) {
-      console.error('Update user error:', error);
-      throw error;
-    }
-  };
-  
+
   return (
-    <AuthContext.Provider
-      value={{
-        user,
-        isAuthenticated: !!user,
-        isLoading,
-        login,
-        signup,
-        logout,
-        updateUser,
-      }}
-    >
+    <AuthContext.Provider value={{ ...state, login, signup, logout }}>
       {children}
     </AuthContext.Provider>
   );
-};
+}
+
+export function useAuth() {
+  const context = useContext(AuthContext);
+  if (!context) {
+    throw new Error('useAuth must be used within an AuthProvider');
+  }
+  return context;
+}

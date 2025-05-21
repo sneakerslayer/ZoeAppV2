@@ -15,9 +15,28 @@ export default function SignupScreen() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
+  const validateEmail = (email: string) => {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  };
+
   const handleSignup = async () => {
     if (!name || !email || !password) {
       setError('Please fill in all fields');
+      return;
+    }
+
+    if (name.length < 2) {
+      setError('Name must be at least 2 characters');
+      return;
+    }
+
+    if (!validateEmail(email)) {
+      setError('Please enter a valid email address');
+      return;
+    }
+
+    if (password.length < 6) {
+      setError('Password must be at least 6 characters');
       return;
     }
     

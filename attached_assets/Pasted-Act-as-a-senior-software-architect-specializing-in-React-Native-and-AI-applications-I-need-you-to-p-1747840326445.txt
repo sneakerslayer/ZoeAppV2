@@ -1,0 +1,113 @@
+Act as a senior software architect specializing in React Native and AI applications. I need you to perform a comprehensive code audit and provide development recommendations for the Zoe AI Therapist app.
+
+Project Context:
+- Mobile app providing AI-powered therapy conversations
+- Built with React Native/Expo
+- Uses TypeScript
+- Implements freemium subscription model
+- Requires secure handling of sensitive user data
+- Needs real-time chat capabilities
+- Must handle therapy-specific features
+
+Tasks:
+
+1. Code Analysis:
+- Review all TypeScript/JavaScript files in the project
+- Analyze the project structure and architecture
+- Evaluate component hierarchy and state management
+- Check authentication implementation
+- Review API integrations
+- Assess security measures
+- Examine error handling
+- Review performance optimizations
+
+2. Identify Issues:
+For each file and system, identify:
+- Security vulnerabilities
+- Performance bottlenecks
+- Code quality issues
+- Missing features
+- Architectural problems
+- Scalability concerns
+- Testing coverage gaps
+Prioritize issues by severity (Critical, High, Medium, Low)
+
+3. Examine Specific Components:
+Auth System:
+- Token management
+- Session handling
+- Security best practices
+- Password reset flow
+- User data protection
+
+Chat Implementation:
+- Message handling
+- Real-time updates
+- Message persistence
+- Error recovery
+- Typing indicators
+- Message status tracking
+
+Subscription System:
+- Tier management
+- Payment processing
+- Usage tracking
+- Upgrade flow
+
+Therapy Features:
+- Mode selection
+- Conversation context
+- Safety measures
+- Crisis intervention
+- Data privacy
+
+4. Provide Solutions:
+For each identified issue:
+- Detailed fix description
+- Code examples
+- Implementation steps
+- Testing requirements
+- Security considerations
+
+5. Development Roadmap:
+Create a prioritized plan including:
+- Critical fixes
+- Feature completion
+- Testing strategy
+- Deployment preparation
+- Performance optimization
+- Security hardening
+
+6. Best Practices Implementation:
+Recommend improvements for:
+- Code organization
+- Error handling
+- State management
+- API integration
+- Security measures
+- Performance optimization
+- Testing coverage
+
+Output Format:
+1. Executive Summary
+2. Detailed Analysis by Component
+3. Prioritized Issues List
+4. Solution Recommendations
+5. Implementation Roadmap
+6. Code Examples
+7. Testing Strategy
+8. Security Recommendations
+
+Please include code snippets and specific implementation details where relevant.
+
+Additional Requirements:
+- Focus on production-ready solutions
+- Consider scalability
+- Prioritize security
+- Account for real-world usage patterns
+- Consider iOS platform-specific requirements
+- Include error handling and edge cases
+- Consider offline capabilities
+- Factor in performance optimization
+
+The analysis should be thorough and provide actionable steps for improvement while maintaining the existing functionality.

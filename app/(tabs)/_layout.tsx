@@ -1,11 +1,11 @@
 import { Tabs } from 'expo-router';
 import { useTheme } from '@/context/ThemeContext';
-import { Home, MessageCircle, User, Settings } from 'lucide-react-native';
+import { Home, MessageCircle, User } from 'lucide-react-native';
 import { Platform } from 'react-native';
 
 export default function TabLayout() {
   const { theme, colors } = useTheme();
-  
+
   return (
     <Tabs
       screenOptions={{
@@ -53,15 +53,7 @@ export default function TabLayout() {
           ),
         }}
       />
-      <Tabs.Screen
-        name="settings"
-        options={{
-          title: 'Settings',
-          tabBarIcon: ({ color, size }) => (
-            <Settings size={size} color={color} />
-          ),
-        }}
-      />
+      {/* Settings screen removed to fix extraneous route warning */}
     </Tabs>
   );
 }

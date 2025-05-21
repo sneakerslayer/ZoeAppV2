@@ -1,119 +1,170 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import { createContext, useContext, useState, useEffect } from 'react';
 import { v4 as uuidv4 } from 'uuid';
-import { Message } from '@/types';
 import { useAuth } from './AuthContext';
-import { TherapyModes } from '@/assets/images/therapy_modes';
+import * as FileSystem from 'expo-file-system';
+
+interface Message {
+  id: string;
+  content: string;
+  sender: 'user' | 'ai';
+  timestamp: string;
+  status: 'sending' | 'sent' | 'error';
+}
 
 interface TherapyContextType {
   messages: Message[];
-  loadingResponse: boolean;
-  sendMessage: (content: string) => void;
+  sendMessage: (content: string) => Promise<void>;
   clearMessages: () => void;
   therapyMode: string;
   setTherapyMode: (index: number) => void;
   messageCount: number;
   isPremium: boolean;
   messagesRemaining: number;
+  retryMessage: (messageId: string) => Promise<void>;
 }
 
-const TherapyContext = createContext<TherapyContextType>({
-  messages: [],
-  loadingResponse: false,
-  sendMessage: () => {},
-  clearMessages: () => {},
-  therapyMode: 'Daily Problems',
-  setTherapyMode: () => {},
-  messageCount: 0,
-  isPremium: false,
-  messagesRemaining: 3,
-});
+const TherapyContext = createContext<TherapyContextType | null>(null);
 
-export const useTherapy = () => useContext(TherapyContext);
-
-export const TherapyProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { isAuthenticated, user } = useAuth();
+export function TherapyProvider({ children }: { children: React.ReactNode }) {
   const [messages, setMessages] = useState<Message[]>([]);
   const [loadingResponse, setLoadingResponse] = useState(false);
   const [therapyModeIndex, setTherapyModeIndex] = useState(0);
   const [messageCount, setMessageCount] = useState(0);
+  const { user, isAuthenticated } = useAuth();
+  const isPremium = user?.isPremium ?? false;
   const [messagesRemaining, setMessagesRemaining] = useState(3);
-  const [isPremium, setIsPremium] = useState(false);
-  
-  // Mock AI responses based on therapy mode
-  const getMockResponse = (prompt: string, mode: string): string => {
-    switch (mode) {
-      case 'Daily Problems':
-        return "I understand you're dealing with some daily challenges. Let's break this down using a CBT approach. What specific thoughts come up when you face this problem?";
-      case 'Relationship Issues':
-        return "Thank you for sharing that relationship concern. From a psychodynamic perspective, I'm curious how this might relate to your early relationship experiences?";
-      case 'Negative Thought Patterns':
-        return "I notice there might be some negative thought patterns here. Let's practice mindfulness first. Take a deep breath, and then we can examine these thoughts with curiosity rather than judgment.";
-      case 'Behavioral Changes':
-        return "If you're looking to change this behavior, we should start by identifying the triggers and consequences. What typically happens right before this behavior occurs?";
-      default:
-        return "I'm here to listen and support you. Could you tell me more about what you're experiencing?";
+
+  useEffect(() => {
+    loadMessages();
+  }, []);
+
+  const loadMessages = async () => {
+    try {
+      const path = `${FileSystem.documentDirectory}messages.json`;
+      const fileExists = await FileSystem.getInfoAsync(path);
+      
+      if (fileExists.exists) {
+        const content = await FileSystem.readAsStringAsync(path);
+        setMessages(JSON.parse(content));
+      }
+    } catch (error) {
+      console.error('Failed to load messages:', error);
     }
   };
-  
-  const sendMessage = (content: string) => {
+
+  const saveMessages = async (newMessages: Message[]) => {
+    try {
+      const path = `${FileSystem.documentDirectory}messages.json`;
+      await FileSystem.writeAsStringAsync(path, JSON.stringify(newMessages));
+    } catch (error) {
+      console.error('Failed to save messages:', error);
+    }
+  };
+
+  const sendMessage = async (content: string) => {
     if (!content.trim()) return;
     
-    // Create user message
     const userMessage: Message = {
       id: uuidv4(),
       content,
       sender: 'user',
       timestamp: new Date().toISOString(),
+      status: 'sending',
     };
     
     setMessages(prev => [...prev, userMessage]);
     setLoadingResponse(true);
     setMessageCount(prev => prev + 1);
     
-    // Reduce remaining messages count for free users
     if (!isPremium) {
       setMessagesRemaining(prev => Math.max(0, prev - 1));
     }
     
-    // Simulate AI response delay
-    setTimeout(() => {
+    try {
+      const response = await fetch('/api/chat', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${user?.tokens?.accessToken}`,
+        },
+        body: JSON.stringify({
+          message: content,
+          therapyMode: TherapyModes[therapyModeIndex].name,
+        }),
+      });
+
+      if (!response.ok) throw new Error('Failed to get AI response');
+
       const aiResponse: Message = {
         id: uuidv4(),
-        content: getMockResponse(content, TherapyModes[therapyModeIndex].name),
+        content: await response.text(),
         sender: 'ai',
         timestamp: new Date().toISOString(),
+        status: 'sent',
       };
       
-      setMessages(prev => [...prev, aiResponse]);
+      const updatedMessages = [...messages, userMessage, aiResponse];
+      setMessages(updatedMessages);
+      await saveMessages(updatedMessages);
+    } catch (error) {
+      setMessages(prev => 
+        prev.map(msg => 
+          msg.id === userMessage.id 
+            ? { ...msg, status: 'error' }
+            : msg
+        )
+      );
+    } finally {
       setLoadingResponse(false);
-    }, 1500);
-  };
-  
-  const clearMessages = () => {
-    setMessages([]);
-  };
-  
-  const setTherapyMode = (index: number) => {
-    if (index >= 0 && index < TherapyModes.length) {
-      setTherapyModeIndex(index);
     }
   };
-  
+
+  const retryMessage = async (messageId: string) => {
+    const message = messages.find(m => m.id === messageId);
+    if (!message) return;
+    
+    setMessages(prev => 
+      prev.filter(m => m.id !== messageId)
+    );
+    
+    await sendMessage(message.content);
+  };
+
+  const clearMessages = async () => {
+    setMessages([]);
+    await saveMessages([]);
+  };
+
+  const TherapyModes = [
+    { name: 'Daily Problems' },
+    { name: 'Depression' },
+    { name: 'Anxiety' },
+  ];
+
+  const value = {
+    messages,
+    loadingResponse,
+    sendMessage,
+    clearMessages,
+    therapyMode: TherapyModes[therapyModeIndex].name,
+    setTherapyMode: setTherapyModeIndex,
+    messageCount,
+    isPremium,
+    messagesRemaining,
+    retryMessage,
+  };
+
   return (
-    <TherapyContext.Provider
-      value={{
-        messages,
-        loadingResponse,
-        sendMessage,
-        clearMessages,
-        therapyMode: TherapyModes[therapyModeIndex].name,
-        setTherapyMode,
-        messageCount,
-        isPremium,
-        messagesRemaining,
-      }}
-    >
+    <TherapyContext.Provider value={value}>
       {children}
     </TherapyContext.Provider>
   );
-};
+}
+
+export function useTherapy() {
+  const context = useContext(TherapyContext);
+  if (!context) {
+    throw new Error('useTherapy must be used within a TherapyProvider');
+  }
+  return context;
+}

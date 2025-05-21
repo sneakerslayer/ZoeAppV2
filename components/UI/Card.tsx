@@ -10,14 +10,15 @@ interface CardProps {
 
 export default function Card({ children, onPress, style }: CardProps) {
   const { colors } = useTheme();
-  
+
   return (
     <TouchableOpacity
+      testID="card"
       style={[
         styles.card,
         {
           backgroundColor: colors.card,
-          shadowColor: colors.shadow,
+          boxShadow: `0px 2px 3.84px ${colors.shadow}`,
         },
         style
       ]}
@@ -33,12 +34,6 @@ const styles = StyleSheet.create({
   card: {
     borderRadius: 16,
     marginBottom: 16,
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
     elevation: 3,
   },
 });

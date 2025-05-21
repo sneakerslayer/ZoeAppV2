@@ -1,0 +1,232 @@
+~/workspace$ npm test
+
+> bolt-expo-starter@1.0.0 test
+> jest
+
+
+ RUNS  __tests__/utils/api.test.ts
+ RUNS  __tests__/components/ErrorBoundary.test.tsx
+
+ RUNS  __tests__/utils/api.test.ts
+ RUNS  __tests__/components/ErrorBoundary.test.tsx
+
+ RUNS  __tests__/utils/api.test.ts
+ RUNS  __tests__/components/ErrorBoundary.test.tsx
+
+ RUNS  __tests__/utils/api.test.ts
+ RUNS  __tests__/components/ErrorBoundary.test.tsx
+
+ RUNS  __tests__/utils/api.test.ts
+ RUNS  __tests__/components/ErrorBoundary.test.tsx
+
+ RUNS  __tests__/utils/api.test.ts
+ RUNS  __tests__/components/ErrorBoundary.test.tsx
+
+ RUNS  __tests__/utils/api.test.ts
+ RUNS  __tests__/components/ErrorBoundary.test.tsx
+
+ RUNS  __tests__/utils/api.test.ts
+ RUNS  __tests__/components/ErrorBoundary.test.tsx
+
+ RUNS  __tests__/utils/api.test.ts
+ RUNS  __tests__/components/ErrorBoundary.test.tsx
+
+ RUNS  __tests__/utils/api.test.ts
+ RUNS  __tests__/components/ErrorBoundary.test.tsx
+
+ RUNS  __tests__/utils/api.test.ts
+ RUNS  __tests__/components/ErrorBoundary.test.tsx
+
+ RUNS  __tests__/utils/api.test.ts
+ RUNS  __tests__/components/ErrorBoundary.test.tsx
+
+ RUNS  __tests__/utils/api.test.ts
+ RUNS  __tests__/components/ErrorBoundary.test.tsx
+
+ RUNS  __tests__/utils/api.test.ts
+ RUNS  __tests__/components/ErrorBoundary.test.tsx
+
+ RUNS  __tests__/utils/api.test.ts
+ RUNS  __tests__/components/ErrorBoundary.test.tsx
+
+ RUNS  __tests__/utils/api.test.ts
+ RUNS  __tests__/components/ErrorBoundary.test.tsx
+
+ RUNS  __tests__/utils/api.test.ts
+ RUNS  __tests__/components/ErrorBoundary.test.tsx
+
+ RUNS  __tests__/utils/api.test.ts
+ RUNS  __tests__/components/ErrorBoundary.test.tsx
+
+ RUNS  __tests__/utils/api.test.ts
+ RUNS  __tests__/components/ErrorBoundary.test.tsx
+
+ RUNS  __tests__/utils/api.test.ts
+ RUNS  __tests__/components/ErrorBoundary.test.tsx
+ PASS  __tests__/utils/api.test.ts (18.214 s)
+
+ RUNS  __tests__/utils/api.test.ts
+ RUNS  __tests__/components/ErrorBoundary.test.tsx
+  ● Console
+
+    console.error
+      API Request failed: Error: API Error: 400
+          at Function.<anonymous> (/home/runner/workspace/utils/api.ts:27:15)
+          at Generator.next (<anonymous>)
+          at asyncGeneratorStep (/home/runner/workspace/node_modules/@babel/runtime/helpers/asyncToGenerator.js:3:17)
+          at _next (/home/runner/workspace/node_modules/@babel/runtime/helpers/asyncToGenerator.js:17:9)
+          at processTicksAndRejections (node:internal/process/task_queues:95:5)
+
+      30 |       return await response.json();
+      31 |     } catch (error) {
+    > 32 |       console.error('API Request failed:', error);
+         |               ^
+      33 |       throw error;
+      34 |     }
+      35 |   }
+
+      at Function.error (utils/api.ts:32:15)
+      at asyncGeneratorStep (node_modules/@babel/runtime/helpers/asyncToGenerator.js:3:17)
+      at _next (node_modules/@babel/runtime/helpers/asyncToGenerator.js:17:9)
+
+
+ RUNS  __tests__/utils/api.test.ts
+ RUNS  __tests__/components/ErrorBoundary.test.tsx
+
+ RUNS  __tests__/utils/api.test.ts
+ RUNS  __tests__/components/ErrorBoundary.test.tsx
+
+ RUNS  __tests__/components/ErrorBoundary.test.tsx
+
+ RUNS  __tests__/components/ErrorBoundary.test.tsx
+
+ RUNS  __tests__/components/ErrorBoundary.test.tsx
+
+ RUNS  __tests__/components/ErrorBoundary.test.tsx
+
+ RUNS  __tests__/components/ErrorBoundary.test.tsx
+
+ RUNS  __tests__/components/ErrorBoundary.test.tsx
+
+ RUNS  __tests__/components/ErrorBoundary.test.tsx
+
+ RUNS  __tests__/components/ErrorBoundary.test.tsx
+
+ RUNS  __tests__/components/ErrorBoundary.test.tsx
+
+ RUNS  __tests__/components/ErrorBoundary.test.tsx
+
+ RUNS  __tests__/components/ErrorBoundary.test.tsx
+ FAIL  __tests__/components/CrisisAlert.test.tsx (28.134 s)
+
+ RUNS  __tests__/components/ErrorBoundary.test.tsx
+  ● CrisisAlert › attempts to call emergency number when pressed
+
+    expect(jest.fn()).toHaveBeenCalledWith(...expected)
+
+    Expected: "tel:911"
+
+    Number of calls: 0
+
+      25 |     
+      26 |     fireEvent.press(getByText(/Call Emergency Services \(911\)/));
+    > 27 |     expect(Linking.openURL).toHaveBeenCalledWith('tel:911');
+         |                             ^
+      28 |   });
+      29 | });
+      30 |
+
+      at Object.toHaveBeenCalledWith (__tests__/components/CrisisAlert.test.tsx:27:29)
+
+
+ RUNS  __tests__/components/ErrorBoundary.test.tsx
+ FAIL  __tests__/components/ErrorBoundary.test.tsx (28.286 s)
+
+ RUNS  __tests__/components/ErrorBoundary.test.tsx
+  ● ErrorBoundary › should render children when no error occurs
+
+    Unable to find an element with testID: test-content
+
+    <View>
+      <Text>
+        Something went wrong
+      </Text>
+      <View
+        accessible={true}
+      >
+        <Text>
+          Try again
+        </Text>
+      </View>
+    </View>
+
+      35 |     );
+      36 |
+    > 37 |     expect(getByTestId('test-content')).toBeTruthy();
+         |            ^
+      38 |   });
+      39 | });
+      40 |
+
+      at Object.getByTestId (__tests__/components/ErrorBoundary.test.tsx:37:12)
+
+
+ RUNS  __tests__/components/ErrorBoundary.test.tsx
+-----------------------------------------|---------|----------|---------|---------|-------------------
+File                                     | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s 
+-----------------------------------------|---------|----------|---------|---------|-------------------
+All files                                |    9.38 |      4.6 |    8.82 |    9.53 |                   
+ workspace                               |       0 |        0 |       0 |       0 |                   
+  expo-env.d.ts                          |       0 |        0 |       0 |       0 |                   
+ workspace/.expo/types                   |       0 |        0 |       0 |       0 |                   
+  router.d.ts                            |       0 |        0 |       0 |       0 |                   
+ workspace/app                           |       0 |        0 |       0 |       0 |                   
+  +not-found.tsx                         |       0 |      100 |       0 |       0 | 5-18              
+  _layout.tsx                            |       0 |        0 |       0 |       0 | 21-46             
+ workspace/app/(auth)                    |       0 |        0 |       0 |       0 |                   
+  _layout.tsx                            |       0 |      100 |       0 |       0 | 5-7               
+  login.tsx                              |       0 |        0 |       0 |       0 | 10-107            
+  signup.tsx                             |       0 |        0 |       0 |       0 | 10-119            
+ workspace/app/(tabs)                    |       0 |        0 |       0 |       0 |                   
+  _layout.tsx                            |       0 |        0 |       0 |       0 | 7-61              
+  chat.tsx                               |       0 |        0 |       0 |       0 | 29-222            
+  index.tsx                              |       0 |        0 |       0 |       0 | 13-140            
+  profile.tsx                            |       0 |        0 |       0 |       0 | 22-321            
+ workspace/assets/images                 |       0 |      100 |     100 |       0 |                   
+  therapy_modes.ts                       |       0 |      100 |     100 |       0 | 8                 
+ workspace/components                    |    87.5 |      100 |      75 |    87.5 |                   
+  ErrorBoundary.tsx                      |    87.5 |      100 |      75 |    87.5 | 33                
+ workspace/components/Chat               |       0 |        0 |       0 |       0 |                   
+  MessageBubble.tsx                      |       0 |        0 |       0 |       0 | 11-36             
+ workspace/components/CrisisIntervention |      80 |      100 |      75 |      80 |                   
+  CrisisAlert.tsx                        |      80 |      100 |      75 |      80 | 18,36             
+ workspace/components/UI                 |       0 |        0 |       0 |       0 |                   
+  Card.tsx                               |       0 |      100 |       0 |       0 | 12-32             
+  Container.tsx                          |       0 |      100 |       0 |       0 | 9-19              
+  EmergencyResourceButton.tsx            |       0 |        0 |       0 |       0 | 11-45             
+  TherapyModePicker.tsx                  |       0 |      100 |       0 |       0 | 12-65             
+ workspace/constants                     |     100 |      100 |     100 |     100 |                   
+  Colors.ts                              |     100 |      100 |     100 |     100 |                   
+ workspace/context                       |    3.17 |        0 |    3.12 |    2.63 |                   
+  AuthContext.tsx                        |       0 |        0 |       0 |       0 | 19-131            
+  ThemeContext.tsx                       |   28.57 |        0 |   14.28 |      25 | 24-45             
+  TherapyContext.tsx                     |       0 |        0 |       0 |       0 | 26-169            
+ workspace/hooks                         |       0 |      100 |       0 |       0 |                   
+  useFrameworkReady.ts                   |       0 |      100 |       0 |       0 | 10-11             
+ workspace/types                         |       0 |        0 |       0 |       0 |                   
+  index.ts                               |       0 |        0 |       0 |       0 |                   
+ workspace/utils                         |   40.74 |    38.46 |      40 |   40.74 |                   
+  api.ts                                 |     100 |      100 |     100 |     100 |                   
+  performance.ts                         |       0 |        0 |       0 |       0 | 13-31             
+-----------------------------------------|---------|----------|---------|---------|-------------------
+Test Suites: 2 failed, 1 passed, 3 total
+Tests:       2 failed, 4 passed, 6 total
+Snapshots:   0 total
+Time:        39.505 s
+Ran all test suites.
+npm notice
+npm notice New major version of npm available! 10.8.2 -> 11.4.0
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v11.4.0
+npm notice To update run: npm install -g npm@11.4.0
+npm notice
+~/workspace$ 
